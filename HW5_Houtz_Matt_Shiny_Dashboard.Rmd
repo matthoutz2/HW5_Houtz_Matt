@@ -1,0 +1,203 @@
+---
+title: "566 Homework 5 Shiny App"
+author: "Matt Houtz"
+output: html_document
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+---
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(shiny)
+library(shinydashboard)
+library(tidyverse)
+library(viridis)
+library(plotly)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(DT)
+library(leaflet)
+```
+
+
+```{r}
+ui <- dashboardPage(
+  
+  skin = "purple",
+  
+  dashboardHeader(
+    title = "2020 PL Stats"
+  ),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Player Data 2020-2021", tabName = "player_data"),
+      menuItem("Play Time by Age 2020-2021", tabName = "age_play_dist"),
+      menuItem("Team Historical Trends", tabName = "team_trends"),
+      menuItem("Number of Player by Country 2020", tabName = "country_data")
+    )
+  ),
+  dashboardBody(
+    tabItems(
+        tabItem("player_data",
+                h3("Individual player statistics for the 2020-2021 Premier League Season"),
+          box(dataTableOutput("t_player.data"), width = 500)
+        ),
+        tabItem("age_play_dist",
+                h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
+          box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
+        ),
+        tabItem("team_trends",
+                h3("End of Season Wins trend for 7 Premier League Teams"),
+                box(plotlyOutput("p_team.trends"), width = 500)
+          
+        ),
+        tabItem("country_data",
+                h3("Number of Players from each country for the 2020 season"),
+                box(leafletOutput("m_country.data"), width = 500)
+        )
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  output$t_player.data <- renderDataTable({
+    players.2020 <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv")
+
+    #Remove unused columns
+    players.2020 <- players.2020[c("Player", "Country", "Pos", "Squad", "Age", "MP", "Starts", "Min", "Gls.", "Ast", "CrdY", "CrdR")]
+    
+    #Create Table
+    players.table <- players.2020 %>%
+      select(Player, Age, Country, Pos, Squad, MP, Starts, Min, Gls., Ast, CrdY, CrdR) %>%
+      datatable(class = 'cell-border stripe',
+                style = 'default',
+            colnames = c("Player",
+                    "Age",
+                    "Country",
+                    "Posistion",
+                    "Squad",
+                    "Played",
+                    "Started",
+                    "Minutes",
+                    "Goals",
+                    "Assists",
+                    "Yellow Cards",
+                    "Red Cards"
+                    ),
+            fillContainer = T,
+            
+            options = list(
+      initComplete = JS(
+        "function(settings, json) {",
+        "$(this.api().table().header()).css({'background-color': '#47004C', 'color': '#fff'});",
+        "}")
+))
+  })
+  
+  
+  output$p_age.playtime <- renderPlotly({
+    # Plot of playing time vs age
+    soccer <- read.csv(file = "C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv", header = T)
+
+    #Sum Minutes and Goals by age and creating a variable for goals per 10 games
+    sums.soccer <- soccer %>% group_by(Age) %>%
+      summarize(Minutes = sum(Min),
+              Goals = sum(Gls.),
+              GlsPer10Gms = (Goals / Minutes) * 900)
+
+    pl.min.vs.age <- ggplot(data = sums.soccer, aes(x = Age, y = Minutes)) + geom_bar(stat = "identity", fill = "mediumpurple4") +
+      theme(plot.title = element_text(hjust = 0.5))
+    
+    pl.min.vs.age
+  })
+  
+  output$p_team.trends <- renderPlotly({
+    pl <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_table_05_20.csv")
+      table(pl$Squad)
+      
+      #Filter to only keep teams that played in the Premiere League for all 16 seasons
+      pl.best <- subset(pl, Squad %in% c("Arsenal", "Everton", "Chelsea", "Manchester City", "Liverpool", "Manchester Utd", "Tottenham"))
+      
+      #Remove columns that have no data
+      pl.best <- pl.best[,1:11]
+      
+      #Rename 2 columns to make them more descriptive
+      names(pl.best)[names(pl.best) == 'W'] <- 'Wins'
+      names(pl.best)[names(pl.best) == 'Rk'] <- 'End.of.Season.Rank'
+      
+      #Highlight by squad when hovering
+      pl.highlight <- highlight_key(pl.best, ~Squad)
+      
+      #Making GGplot object
+      pl.gg <- ggplot(data = pl.highlight,
+                      mapping = aes(x = Year,
+                                    y = Wins,
+                                    label = End.of.Season.Rank,
+                                    color = Squad)) + 
+        geom_point(aes(),
+                   alpha = 1,
+                   shape = 20, size = 1.5) +
+        geom_smooth(method = "loess", se = FALSE, lwd = .5) +
+        ylab("Wins") +
+        scale_y_continuous(breaks = seq(0, 40, by = 5)) + 
+        theme_classic(base_size = 12) +
+        theme(legend.position = c(0.87, 0.25))
+      
+      #Create plotly object
+      pl.plotly.highlight <- ggplotly(pl.gg, tooltip = c("Squad", "Wins", "End.of.Season.Rank")) %>%
+        highlight(on = "plotly_hover",
+                  off = "plotly_relayout")
+      
+      #Display object
+      pl.plotly.highlight
+  })
+  
+  output$m_country.data <- renderLeaflet({
+        #Read in player data
+        players <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv")
+        country.counts <- table(players$Country)
+        country.df <- as.data.frame(country.counts)
+        colnames(country.df) <- c('Country', 'Count')
+        
+        #Read in Lat/Long data
+        lat.lon <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/Country Coordinates.csv")
+        
+        #Merge data sets to put latitude and longitude with counts
+        countries <- merge(country.df, lat.lon, by="Country")
+        
+        #Create Hover Data
+        labs <- lapply(seq(nrow(countries)), 
+                       function(i) {
+          paste0( "", as.character(countries[i, "Country"]), '<br>',
+                 "Number of Players in PL: ", as.character(countries[i, "Count"]),'' ) 
+        })
+        
+        class(labs)
+        
+        icons <- awesomeIcons(
+          icon = 'ios-close',
+          iconColor = 'black',
+          library = 'fa',   
+          text=countries$Count, 
+          markerColor = 'purple'
+        )
+        countries %>% leaflet() %>% 
+        addProviderTiles(providers$OpenStreetMap.Mapnik, group = "Street Map") %>%
+        addProviderTiles(providers$OpenTopoMap, group = "Topograph") %>%
+        addLayersControl(baseGroups = c("Street Map", "Topograph")) %>%
+        addAwesomeMarkers(label = ~lapply(labs, htmltools::HTML), icon=icons) %>%
+        setView(lat = 23.1627859, lng = -42.545339, zoom = 2) %>%
+        addMiniMap(
+          toggleDisplay = TRUE,
+          tiles = providers$Stamen.TonerLite
+          )
+  })
+
+}
+
+shinyApp(ui, server)
+```
