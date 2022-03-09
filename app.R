@@ -45,7 +45,7 @@ ui <- dashboardPage(
       )
     )
   )
-)
+
 
 server <- function(input, output) {
   
