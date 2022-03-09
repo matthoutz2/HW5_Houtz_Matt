@@ -73,8 +73,6 @@ server <- function(input, output) {
                              "Yellow Cards",
                              "Red Cards"
                 ),
-                fillContainer = T,
-                
                 options = list(
                   initComplete = JS(
                     "function(settings, json) {",
