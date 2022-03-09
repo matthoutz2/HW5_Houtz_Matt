@@ -56,7 +56,8 @@ ui <- dashboardPage(
         ),
         tabItem("country_data",
                 h3("Number of Players from each country for the 2020 season"),
-                box(leafletOutput("m_country.data"), width = 500),
+                box(leafletOutput("m_country.data"), width = 500)
+                ),
         tabItem("age_play_dist",
                 h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
           box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
@@ -64,8 +65,6 @@ ui <- dashboardPage(
         tabItem("team_trends",
                 h3("End of Season Wins trend for 7 Premier League Teams"),
                 box(plotlyOutput("p_team.trends"), width = 500)
-          
-        )
         )
     )
   )
