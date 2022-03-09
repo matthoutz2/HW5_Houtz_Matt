@@ -8,6 +8,9 @@ library(ggplot2)
 library(ggthemes)
 library(DT)
 library(leaflet)
+library(knitr)
+library(kableExtra)
+
 ui <- dashboardPage(
   
   skin = "purple",
@@ -17,6 +20,7 @@ ui <- dashboardPage(
   ),
   dashboardSidebar(
     sidebarMenu(
+      menuItem("2020 Table", tabName = "2020_table"),
       menuItem("Player Data 2020-2021", tabName = "player_data"),
       menuItem("Number of Player by Country 2020", tabName = "country_data"),
       menuItem("Play Time by Age 2020-2021", tabName = "age_play_dist"),
@@ -25,19 +29,22 @@ ui <- dashboardPage(
   ),
   dashboardBody(
     tabItems(
+      tabItem("2020_table",
+              h3("2020 Results Table"),
+              box(tableOutput("t_2020.table"), width = 500)
+      ),
       tabItem("player_data",
               h3("Individual player statistics for the 2020-2021 Premier League Season"),
               box(dataTableOutput("t_player.data"), width = 500)
       ),
       tabItem("country_data",
               h3("Number of Players from each country for the 2020 season"),
-              box(leafletOutput("m_country.data"), width = 500)
-      ),
-      tabItem("age_play_dist",
-              h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
-              box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
-      ),
-      tabItem("team_trends",
+              box(leafletOutput("m_country.data"), width = 500),
+              tabItem("age_play_dist",
+                      h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
+                      box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
+              ),
+              tabItem("team_trends",
                       h3("End of Season Wins trend for 7 Premier League Teams"),
                       box(plotlyOutput("p_team.trends"), width = 500)
                       
@@ -45,9 +52,27 @@ ui <- dashboardPage(
       )
     )
   )
-
+)
 
 server <- function(input, output) {
+  
+  output$t_2020.table <- function(){
+    table.2020 <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/2020_table.csv")
+    
+    colnames(table.2020) <- c("Squad",
+                              "Matches Played",
+                              "Goals",
+                              "Assists",
+                              "Made",
+                              "Attempted",
+                              "Yellow",
+                              "Red")
+    
+    table.2020 %>%
+      knitr::kable("html") %>%
+      add_header_above(c(" ", " ", " ", " ", "Penalty Kicks" = 2, "Cards" = 2)) %>%
+      kable_styling(bootstrap_options = "hover", full_width = FALSE, font_size = 15)
+  }
   
   output$t_player.data <- renderDataTable({
     players.2020 <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv")

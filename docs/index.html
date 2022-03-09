@@ -179,7 +179,10 @@ library(dplyr)
 library(ggplot2)
 library(ggthemes)
 library(DT)
-library(leaflet)</code></pre>
+library(leaflet)
+library(knitr)
+library(kableExtra)
+library(dplyr)</code></pre>
 <pre class="r"><code>ui &lt;- dashboardPage(
   
   skin = &quot;purple&quot;,
@@ -189,6 +192,7 @@ library(leaflet)</code></pre>
   ),
   dashboardSidebar(
     sidebarMenu(
+      menuItem(&quot;2020 Table&quot;, tabName = &quot;2020_table&quot;),
       menuItem(&quot;Player Data 2020-2021&quot;, tabName = &quot;player_data&quot;),
       menuItem(&quot;Number of Player by Country 2020&quot;, tabName = &quot;country_data&quot;),
       menuItem(&quot;Play Time by Age 2020-2021&quot;, tabName = &quot;age_play_dist&quot;),
@@ -197,6 +201,10 @@ library(leaflet)</code></pre>
   ),
   dashboardBody(
     tabItems(
+        tabItem(&quot;2020_table&quot;,
+                h3(&quot;2020 Results Table&quot;),
+                box(tableOutput(&quot;t_2020.table&quot;), width = 500)
+        ),
         tabItem(&quot;player_data&quot;,
                 h3(&quot;Individual player statistics for the 2020-2021 Premier League Season&quot;),
           box(dataTableOutput(&quot;t_player.data&quot;), width = 500)
@@ -219,6 +227,24 @@ library(leaflet)</code></pre>
 )
 
 server &lt;- function(input, output) {
+  
+  output$t_2020.table &lt;- function(){
+    table.2020 &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/2020_table.csv&quot;)
+    
+    colnames(table.2020) &lt;- c(&quot;Squad&quot;,
+                              &quot;Matches Played&quot;,
+                              &quot;Goals&quot;,
+                              &quot;Assists&quot;,
+                              &quot;Made&quot;,
+                              &quot;Attempted&quot;,
+                              &quot;Yellow&quot;,
+                              &quot;Red&quot;)
+
+    table.2020 %&gt;%
+      knitr::kable(&quot;html&quot;) %&gt;%
+      add_header_above(c(&quot; &quot;, &quot; &quot;, &quot; &quot;, &quot; &quot;, &quot;Penalty Kicks&quot; = 2, &quot;Cards&quot; = 2)) %&gt;%
+      kable_styling(bootstrap_options = &quot;hover&quot;, full_width = FALSE, font_size = 15)
+      }
   
   output$t_player.data &lt;- renderDataTable({
     players.2020 &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv&quot;)
@@ -354,7 +380,7 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p><iframe data-deferred-src="appfcd41e779242e1ab92324e6d16ce6409/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
+<p><iframe data-deferred-src="appeaf1ca933411d184fc3ce0e0bafe18e8/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
 
 
 
