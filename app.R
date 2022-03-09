@@ -18,9 +18,9 @@ ui <- dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("Player Data 2020-2021", tabName = "player_data"),
+      menuItem("Number of Player by Country 2020", tabName = "country_data"),
       menuItem("Play Time by Age 2020-2021", tabName = "age_play_dist"),
-      menuItem("Team Historical Trends", tabName = "team_trends"),
-      menuItem("Number of Player by Country 2020", tabName = "country_data")
+      menuItem("Team Historical Trends", tabName = "team_trends")
     )
   ),
   dashboardBody(
@@ -29,18 +29,18 @@ ui <- dashboardPage(
               h3("Individual player statistics for the 2020-2021 Premier League Season"),
               box(dataTableOutput("t_player.data"), width = 500)
       ),
-      tabItem("age_play_dist",
-              h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
-              box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
-      ),
-      tabItem("team_trends",
-              h3("End of Season Wins trend for 7 Premier League Teams"),
-              box(plotlyOutput("p_team.trends"), width = 500)
-              
-      ),
       tabItem("country_data",
               h3("Number of Players from each country for the 2020 season"),
-              box(leafletOutput("m_country.data"), width = 500)
+              box(leafletOutput("m_country.data"), width = 500),
+              tabItem("age_play_dist",
+                      h3("Distribution of play time by age of players for 2020-2021 Premier League Season"),
+                      box(plotlyOutput("p_age.playtime"), width = 700, height = 750)
+              ),
+              tabItem("team_trends",
+                      h3("End of Season Wins trend for 7 Premier League Teams"),
+                      box(plotlyOutput("p_team.trends"), width = 500)
+                      
+              )
       )
     )
   )

@@ -190,9 +190,9 @@ library(leaflet)</code></pre>
   dashboardSidebar(
     sidebarMenu(
       menuItem(&quot;Player Data 2020-2021&quot;, tabName = &quot;player_data&quot;),
+      menuItem(&quot;Number of Player by Country 2020&quot;, tabName = &quot;country_data&quot;),
       menuItem(&quot;Play Time by Age 2020-2021&quot;, tabName = &quot;age_play_dist&quot;),
-      menuItem(&quot;Team Historical Trends&quot;, tabName = &quot;team_trends&quot;),
-      menuItem(&quot;Number of Player by Country 2020&quot;, tabName = &quot;country_data&quot;)
+      menuItem(&quot;Team Historical Trends&quot;, tabName = &quot;team_trends&quot;)
     )
   ),
   dashboardBody(
@@ -201,6 +201,9 @@ library(leaflet)</code></pre>
                 h3(&quot;Individual player statistics for the 2020-2021 Premier League Season&quot;),
           box(dataTableOutput(&quot;t_player.data&quot;), width = 500)
         ),
+        tabItem(&quot;country_data&quot;,
+                h3(&quot;Number of Players from each country for the 2020 season&quot;),
+                box(leafletOutput(&quot;m_country.data&quot;), width = 500),
         tabItem(&quot;age_play_dist&quot;,
                 h3(&quot;Distribution of play time by age of players for 2020-2021 Premier League Season&quot;),
           box(plotlyOutput(&quot;p_age.playtime&quot;), width = 700, height = 750)
@@ -209,10 +212,7 @@ library(leaflet)</code></pre>
                 h3(&quot;End of Season Wins trend for 7 Premier League Teams&quot;),
                 box(plotlyOutput(&quot;p_team.trends&quot;), width = 500)
           
-        ),
-        tabItem(&quot;country_data&quot;,
-                h3(&quot;Number of Players from each country for the 2020 season&quot;),
-                box(leafletOutput(&quot;m_country.data&quot;), width = 500)
+        )
         )
     )
   )
@@ -356,7 +356,7 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p><iframe data-deferred-src="app437013154423087f1100e93c71324d8a/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
+<p><iframe data-deferred-src="app51df23808395044b1c89558cd7631e42/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
 
 
 
