@@ -228,7 +228,7 @@ library(dplyr)</code></pre>
 server &lt;- function(input, output) {
   
   output$t_2020.table &lt;- function(){
-    table.2020 &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/2020_table.csv&quot;)
+    table.2020 &lt;- read.csv(&quot;2020_table.csv&quot;)
     
     colnames(table.2020) &lt;- c(&quot;Squad&quot;,
                               &quot;Matches Played&quot;,
@@ -246,7 +246,7 @@ server &lt;- function(input, output) {
       }
   
   output$t_player.data &lt;- renderDataTable({
-    players.2020 &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv&quot;)
+    players.2020 &lt;- read.csv(&quot;pl_2020.csv&quot;)
 
     #Remove unused columns
     players.2020 &lt;- players.2020[c(&quot;Player&quot;, &quot;Country&quot;, &quot;Pos&quot;, &quot;Squad&quot;, &quot;Age&quot;, &quot;MP&quot;, &quot;Starts&quot;, &quot;Min&quot;, &quot;Gls.&quot;, &quot;Ast&quot;, &quot;CrdY&quot;, &quot;CrdR&quot;)]
@@ -280,7 +280,7 @@ server &lt;- function(input, output) {
   
   output$p_age.playtime &lt;- renderPlotly({
     # Plot of playing time vs age
-    soccer &lt;- read.csv(file = &quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv&quot;, header = T)
+    soccer &lt;- read.csv(file = &quot;pl_2020.csv&quot;, header = T)
 
     #Sum Minutes and Goals by age and creating a variable for goals per 10 games
     sums.soccer &lt;- soccer %&gt;% group_by(Age) %&gt;%
@@ -295,7 +295,7 @@ server &lt;- function(input, output) {
   })
   
   output$p_team.trends &lt;- renderPlotly({
-    pl &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_table_05_20.csv&quot;)
+    pl &lt;- read.csv(&quot;pl_table_05_20.csv&quot;)
       table(pl$Squad)
       
       #Filter to only keep teams that played in the Premiere League for all 16 seasons
@@ -337,13 +337,13 @@ server &lt;- function(input, output) {
   
   output$m_country.data &lt;- renderLeaflet({
         #Read in player data
-        players &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv&quot;)
+        players &lt;- read.csv(&quot;pl_2020.csv&quot;)
         country.counts &lt;- table(players$Country)
         country.df &lt;- as.data.frame(country.counts)
         colnames(country.df) &lt;- c(&#39;Country&#39;, &#39;Count&#39;)
         
         #Read in Lat/Long data
-        lat.lon &lt;- read.csv(&quot;C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/Country Coordinates.csv&quot;)
+        lat.lon &lt;- read.csv(&quot;Country Coordinates.csv&quot;)
         
         #Merge data sets to put latitude and longitude with counts
         countries &lt;- merge(country.df, lat.lon, by=&quot;Country&quot;)
@@ -379,7 +379,7 @@ server &lt;- function(input, output) {
 }
 
 shinyApp(ui, server)</code></pre>
-<p><iframe data-deferred-src="app47b8ace28165180ba288d2d4fd2c3d5d/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
+<p><iframe data-deferred-src="app7b138cd01dc735ced90999b9d093e6f7/?w=&amp;__subapp__=1" width="100%" height="400" class="shiny-frame shiny-frame-deferred"></iframe></p>
 
 
 

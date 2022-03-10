@@ -56,7 +56,7 @@ ui <- dashboardPage(
 server <- function(input, output) {
   
   output$t_2020.table <- function(){
-    table.2020 <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/2020_table.csv")
+    table.2020 <- read.csv("2020_table.csv")
     
     colnames(table.2020) <- c("Squad",
                               "Matches Played",
@@ -74,7 +74,7 @@ server <- function(input, output) {
   }
   
   output$t_player.data <- renderDataTable({
-    players.2020 <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv")
+    players.2020 <- read.csv("pl_2020.csv")
     
     #Remove unused columns
     players.2020 <- players.2020[c("Player", "Country", "Pos", "Squad", "Age", "MP", "Starts", "Min", "Gls.", "Ast", "CrdY", "CrdR")]
@@ -108,7 +108,7 @@ server <- function(input, output) {
   
   output$p_age.playtime <- renderPlotly({
     # Plot of playing time vs age
-    soccer <- read.csv(file = "C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv", header = T)
+    soccer <- read.csv(file = "pl_2020.csv", header = T)
     
     #Sum Minutes and Goals by age and creating a variable for goals per 10 games
     sums.soccer <- soccer %>% group_by(Age) %>%
@@ -123,7 +123,7 @@ server <- function(input, output) {
   })
   
   output$p_team.trends <- renderPlotly({
-    pl <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_table_05_20.csv")
+    pl <- read.csv("pl_table_05_20.csv")
     table(pl$Squad)
     
     #Filter to only keep teams that played in the Premiere League for all 16 seasons
@@ -165,13 +165,13 @@ server <- function(input, output) {
   
   output$m_country.data <- renderLeaflet({
     #Read in player data
-    players <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/pl_2020.csv")
+    players <- read.csv("pl_2020.csv")
     country.counts <- table(players$Country)
     country.df <- as.data.frame(country.counts)
     colnames(country.df) <- c('Country', 'Count')
     
     #Read in Lat/Long data
-    lat.lon <- read.csv("C:/Users/matth/Documents/Grad School/Spring 2022/STAA 566/Data/Country Coordinates.csv")
+    lat.lon <- read.csv("Country Coordinates.csv")
     
     #Merge data sets to put latitude and longitude with counts
     countries <- merge(country.df, lat.lon, by="Country")
